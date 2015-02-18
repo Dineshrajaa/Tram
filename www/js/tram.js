@@ -34,16 +34,15 @@ $(document).ready(function(){
 		var lpass=$("#upass").val();
 		dbName.transaction(function(tx){
 			tx.executeSql("select * from passengertable where pfname='"+lname+"' and ppass='"+lpass+"'",[],function(transaction,results){
-				//alert(results.rows.length);
-				if(results.rows.length>0) alert("Login Successful");
+				
+				if(results.rows.length>0) $(":mobile-pagecontainer").pagecontainer("change","#pd-page");
 				else alert("Check your Login Credentials");
 			});
 		});
 	}
 
 	//Method to validate and Loging Admin
-	function loginAdmin(){
-		
+	function loginAdmin(){		
 		var alname=$("#aname").val();
 		var alpass=$("#apass").val();
 		if (alname=="admin" && alpass=="admin") alert("Welcome Admin");
