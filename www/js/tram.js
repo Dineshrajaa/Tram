@@ -84,6 +84,7 @@ $(document).ready(function(){
 
 	//Reusable Method for Populating Source and Destination Dropdown Menu
 	function populateMenu(){
+		$("#sourcemenu,#destinationmenu,#possibletramlist").html(" ");
 		dbName.transaction(function(tx){
 			tx.executeSql("select * from tramtable",[],function(tx,results){
 				for(var i=0;i<results.rows.length;i++){
