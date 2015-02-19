@@ -92,7 +92,7 @@
         </section>
         <section data-role="page" id="pd-page">
             <header data-role="header" data-theme="b" data-position="fixed">
-            <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
+            <a href="#" data-role="button" data-rel="back" data-icon="power" data-iconpos="notext" class="ui-btn-right">Logout</a>
             <h1>Passenger Home</h1>
             </header>
             <article data-role="content">
@@ -100,6 +100,57 @@
                 <input type="button" id="trackpgbtn" value="Track Tickets" />
                 <input type="button" id="enquirepgbtn" value="Enquire Tickets" />
             </article>
+        </section>
+        <section data-role="page" id="ad-page">
+            <header data-role="header" data-theme="b" data-position="fixed">
+            <a href="#" data-role="button" data-rel="back" data-icon="power" data-iconpos="notext" class="ui-btn-right">Logout</a>
+            <h1>Admin Home</h1>
+            </header>
+            <article data-role="contents">
+                <input type="button" value="Add Tram Details" id="atdbtn" />
+                <input type="button" value="View Tram Details" id="vtdbtn" />
+                <input type="button" value="Approve Tickets" id="atdbtn" />
+            </article>
+            <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
+            <h1>&copy All Rights Reserved</h1>
+            </footer>
+        </section>
+        <section data-role="page" id="atd-page">
+            <header data-role="header" data-theme="b" data-position="fixed">
+            <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
+            <h1>Add Tram Details</h1>
+            </header>
+            <article data-role="content">
+                <label for="tramname">Tram Name</label>
+                <input type="text" id="tramname" placeholder="Example:Chengalpat Tram" />
+                <label for="tramarrivaltime">Arrival Time</label>
+                <input type="text" id="tramarrivaltime" placeholder="Example:14.00"/>
+                <label for="tramdeparturetime">Departure Time</label>
+                <input type="text" id="tramdeparturetime" placeholder="Example:14.15"/>
+                <label for="tramsource">Source</label>
+                <input type="text" id="tramsource" placeholder="Example:Chengalpat"/>
+                <label for="tramdestination">Destination</label>
+                <input type="text" id="tramdestination" placeholder="Example:Central"/>
+                <label for="tramfare">Fare</label>
+                <input type="text" id="tramfare" placeholder="Example:10"/>
+                <input type="button" id="atbtn" value="Add Tram" data-inline="true" />
+                <input type="reset" id="resetbtn" value="Reset" data-inline="true"/>                
+            </article>
+            <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
+            <h1>&copy All Rights Reserved</h1>
+            </footer>
+        </section>
+        <section id="vtd-page" data-role="page">
+            <header data-role="header" data-theme="b" data-position="fixed">
+            <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
+            <h1>Tram List</h1>
+            </header>
+            <article data-role="content">
+                <ul id="tramlist" data-role="listview" data-icon="false"></ul>
+            </article>
+            <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
+            <h1>&copy All Rights Reserved</h1>
+            </footer>
         </section>
         <script type="text/javascript" src="cordova.js"></script>        
     </body>

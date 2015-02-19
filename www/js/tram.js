@@ -7,8 +7,8 @@ $(document).ready(function(){
 		dbName.transaction(function(tx){
 			//tx.executeSql("drop table passengertable");
 			tx.executeSql("create table if not exists passengertable(pid integer primary key,pfname text unique,plname text,page integer,ppass text,pphone text,paddress text)");
-			//alert("Created Ptable");
-			tx.executeSql("create table if not exists tramtable(tid integer primary key,tname text unique,tday text,ttime text,tsource text,tdestination text)");
+			//tx.executeSql("drop table tramtable");
+			tx.executeSql("create table if not exists tramtable(tid integer primary key,tname text unique,tatime text,tdtime text,tsource text,tdestination text,tfare)");
 			//alert("Created Ttable");
 		});
 	}
@@ -28,13 +28,11 @@ $(document).ready(function(){
 	}
 
 	//Method to validate and Login Passengers
-	function loginPassenger(){
-		//alert("Going to Login");
+	function loginPassenger(){		
 		var lname=$("#uname").val();
 		var lpass=$("#upass").val();
 		dbName.transaction(function(tx){
-			tx.executeSql("select * from passengertable where pfname='"+lname+"' and ppass='"+lpass+"'",[],function(transaction,results){
-				
+			tx.executeSql("select * from passengertable where pfname='"+lname+"' and ppass='"+lpass+"'",[],function(transaction,results){				
 				if(results.rows.length>0) $(":mobile-pagecontainer").pagecontainer("change","#pd-page");
 				else alert("Check your Login Credentials");
 			});
@@ -45,8 +43,43 @@ $(document).ready(function(){
 	function loginAdmin(){		
 		var alname=$("#aname").val();
 		var alpass=$("#apass").val();
-		if (alname=="admin" && alpass=="admin") alert("Welcome Admin");
+		if (alname=="admin" && alpass=="admin") $(":mobile-pagecontainer").pagecontainer("change","#ad-page");
 		else alert("Sorry you are not admin");
+	}
+
+	//Method to add Tram
+	function addTram(){
+		var stname=$("#tramname").val();
+		var statime=$("#tramarrivaltime").val();
+		var stdtime=$("#tramdeparturetime").val();
+		var stsource=$("#tramsource").val();
+		var stdestination=$("#tramdestination").val();
+		var stfare=$("#tramfare").val();
+		dbName.transaction(function(tx){
+			tx.executeSql("insert into tramtable(tname,tatime,tdtime,tsource,tdestination,tfare) values(?,?,?,?,?,?)",[stname,statime,stdtime,stsource,stdestination,stfare]);
+		});
+		toastAlert("Saved Tram Details");
+		onTramListRequest();
+	}
+
+	//Method to list Trams
+	function listTram(){
+		$("#tramlist").html(" ");
+		dbName.transaction(function(tx){
+			tx.executeSql("select * from tramtable",[],function(tx,results){
+				for(var i=0;i<results.rows.length;i++){
+					var row=results.rows.item(i);
+					$("#tramlist").append("<li id='"+i+"'><a href='#'><h2>"+row.tname+"</h2><p>Availability:Daily<br/>Arrival:"+row.tatime+" Departure:"+row.tdtime+"<br/>Source:"+row.tsource+" Destination:"+row.tdestination+"</p><p class='ui-li-aside'>Rs."+row.tfare+"</p></li>");
+				}
+				$("#tramlist").listview("refresh");
+			});
+		});
+	}
+
+	//Reusable Method for Listing Tram Details
+	function onTramListRequest(){
+		$(":mobile-pagecontainer").pagecontainer("change","#vtd-page");
+		listTram();
 	}
 
 		/**End of DB Methods**/
@@ -77,14 +110,25 @@ $(document).ready(function(){
 	});
 
 	$("#albtn").tap(function(){
-		//Shows Passenger Login Form
+		//Shows Admin Login Form
 		$(":mobile-pagecontainer").pagecontainer("change","#al-page");
+	});
+
+	$("#atdbtn").tap(function(){
+		//Shows Add Tram Page
+		$(":mobile-pagecontainer").pagecontainer("change","#atd-page");
 	});
 
 	$("#regbtn").tap(registerPassenger);
 
 	$("#loginbtn").tap(loginPassenger);
 
-	$("#adminloginbtn").tap(loginAdmin);
+	$("#adminloginbtn").tap(loginAdmin);	
+
+	$("#atbtn").tap(addTram);
+
+	$("#vtdbtn").tap(onTramListRequest);
+
+	
 	//Loaded all DOM elements
 });
