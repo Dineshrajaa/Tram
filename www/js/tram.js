@@ -82,8 +82,37 @@ $(document).ready(function(){
 		listTram();
 	}
 
-		/**End of DB Methods**/
+	//Reusable Method for Populating Source and Destination Dropdown Menu
+	function populateMenu(){
+		dbName.transaction(function(tx){
+			tx.executeSql("select * from tramtable",[],function(tx,results){
+				for(var i=0;i<results.rows.length;i++){
+					var row=results.rows.item(i);
+					$("#sourcemenu").append("<option value='"+i+"'>"+row.tsource+"</option>");
+					$("#destinationmenu").append("<option value='"+i+"'>"+row.tdestination+"</option>");
+				}
+				$("#sourcemenu,#destinationmenu").selectmenu("refresh");
+			});
+		});
+		
+	}
 
+	//Reusable Method for listing Available Trams
+	function findAvailableTrams(){
+		var fsource=$("#sourcemenu :selected").text();
+		var fdestination=$("#destinationmenu :selected").text();
+		$("#possibletramlist").html(" ");
+		dbName.transaction(function(tx){
+			tx.executeSql("select * from tramtable where tsource='"+fsource+"' and tdestination='"+fdestination+"'",[],function(tx,results){
+				for(var i=0;i<results.rows.length;i++){
+					var row=results.rows.item(i);
+					$("#possibletramlist").append("<li id='"+i+"'><a href='#'><h2>"+row.tname+"</h2><p>Availability:Daily<br/>Arrival:"+row.tatime+" Departure:"+row.tdtime+"<br/>Source:"+row.tsource+" Destination:"+row.tdestination+"</p><p class='ui-li-aside'>Rs."+row.tfare+"</p></li>");
+				}
+				$("#possibletramlist").listview("refresh");
+			});
+		});
+	}
+		/**End of DB Methods**/
 	//Method to display Toast Alerts
 	function toastAlert(msg){
 		window.plugins.toast.showLongBottom(msg);
@@ -119,6 +148,12 @@ $(document).ready(function(){
 		$(":mobile-pagecontainer").pagecontainer("change","#atd-page");
 	});
 
+	$("#bookpgbtn").tap(function(){
+		//Shows Booking Page
+		$(":mobile-pagecontainer").pagecontainer("change","#bpd-page");
+		populateMenu();
+	});
+
 	$("#regbtn").tap(registerPassenger);
 
 	$("#loginbtn").tap(loginPassenger);
@@ -129,6 +164,7 @@ $(document).ready(function(){
 
 	$("#vtdbtn").tap(onTramListRequest);
 
+	$("#tramsearchbtn").tap(findAvailableTrams);
 	
 	//Loaded all DOM elements
 });
