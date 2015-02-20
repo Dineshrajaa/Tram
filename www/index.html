@@ -14,6 +14,7 @@
         <title>Tram</title>
     </head>
     <body>
+            <!--Main Home Page-->
         <section data-role="page" id="home-page">
             <header data-role="header" data-theme="b" data-position="fixed">
                 <h1>Tram Home</h1>
@@ -22,14 +23,14 @@
                <input type="button" id="prbtn" value="Passenger Registration" data-mini="false" />
                <input type="button" id="plbtn" value="Passenger Login" data-mini="false" />
                <input type="button" id="albtn" value="Admin Login" data-mini="false"/>
-               <!--<input type="button" id="tdbtn" value="Tram Detail" data-mini="false"/> 
-               <input type="button" id="tsbtn" value="Tram Search" data-mini="false"/> -->
+               <input type="button" id="tdbtn" value="Tram Detail" data-mini="false"/> 
+               <input type="button" id="tsbtn" value="Tram Search" data-mini="false"/>
             </article>
             <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <h1>&copy All Rights Reserved</h1>
             </footer>
         </section>
-
+            <!--Passenger Registration Page-->
         <section data-role="page" id="pr-page">
              <header data-role="header" data-theme="b" data-position="fixed">
                 <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
@@ -57,6 +58,8 @@
             <h1>&copy All Rights Reserved</h1>
             </footer>
         </section>
+
+                <!--Passenger Login Page-->
         <section data-role="page" id="pl-page">
             <header data-role="header" data-theme="b" data-position="fixed">
                 <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
@@ -67,13 +70,14 @@
                 <input type="text" id="uname" placeholder="Username" data-inline="true"/>
                 <a href="#" data-role="button" data-icon="lock" data-iconpos="notext" data-theme="b" data-disabled="true" data-inline="true">Password</a>
                 <input type="password" id="upass" placeholder="Password" />
-                <input type="button" id="loginbtn" value="Login" data-icon="check" />               
-                
+                <input type="button" id="loginbtn" value="Login" data-icon="check" />             
             </article>
             <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <h1>&copy All Rights Reserved</h1>
             </footer>
         </section>
+
+            <!--Admin Login Page-->
         <section data-role="page" id="al-page">
             <header data-role="header" data-theme="b" data-position="fixed">
             <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
@@ -90,6 +94,7 @@
             <h1>&copy All Rights Reserved</h1>
             </footer>
         </section>
+            <!--Passenger Home-->
         <section data-role="page" id="pd-page">
             <header data-role="header" data-theme="b" data-position="fixed">
             <a href="#" data-role="button" data-rel="back" data-icon="power" data-iconpos="notext" class="ui-btn-right">Logout</a>
@@ -115,6 +120,8 @@
             <h1>&copy All Rights Reserved</h1>
             </footer>
         </section>
+
+                <!--Add Tram Page-->
         <section data-role="page" id="atd-page">
             <header data-role="header" data-theme="b" data-position="fixed">
             <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
@@ -133,6 +140,8 @@
                 <input type="text" id="tramdestination" placeholder="Example:Central"/>
                 <label for="tramfare">Fare</label>
                 <input type="text" id="tramfare" placeholder="Example:10"/>
+                <label for="tramcapacity"></label>
+                <input type="text" id="tramcapacity" placeholder="Example:100" />
                 <input type="button" id="atbtn" value="Add Tram" data-inline="true" />
                 <input type="reset" id="resetbtn" value="Reset" data-inline="true"/>                
             </article>
@@ -140,6 +149,8 @@
             <h1>&copy All Rights Reserved</h1>
             </footer>
         </section>
+
+            <!--Tram Listview Page-->
         <section id="vtd-page" data-role="page">
             <header data-role="header" data-theme="b" data-position="fixed">
             <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
@@ -152,10 +163,12 @@
             <h1>&copy All Rights Reserved</h1>
             </footer>
         </section>
+
+                <!--Tram Search Page -->
         <section id="bpd-page" data-role="page">
             <header data-role="header" data-theme="b" data-position="fixed">
             <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
-            <h1>Book Tickets</h1>
+            <h1>Search &amp; Book</h1>
             </header>
             <article data-role="content">
                 <label for="sourcemenu">Source:</label>
@@ -168,6 +181,33 @@
             <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <h1>&copy All Rights Reserved</h1>
             </footer>
+        </section>
+
+                <!--Tram Booking Prompt-->
+        <section id="bookingprompt-page" data-role="page">
+            <header data-role="header" data-theme="b" data-position="fixed">
+                <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
+                <h1>Book Tickets</h1>
+            </header>
+            <article data-role="article">
+                <form id="bookingform">
+                <label id="selectedtramlabel"></label>
+                <label id="bookingidlabel"></label>
+                <label id="availablecount"></label>
+                <p id="selectedtrampara"></p>
+                <label for="tramclass">Class</label>
+                <select id="tramclass">
+                <option id="upper">Upper</option>
+                <option id="lower">Lower</option>
+                <option id="middle">Middle</option>
+                <option id="sitting">Sitting</option>
+                <option id="side">Side</option>
+                </select>
+                <label for="seatcount">Seat Count</label>
+                <input type="number" id="seatcount" min="1" max="100" />
+                <input type="button" id="bookbtn" />
+                </form>
+            </article>
         </section>
         <script type="text/javascript" src="cordova.js"></script>        
     </body>

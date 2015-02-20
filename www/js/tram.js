@@ -8,9 +8,9 @@ $(document).ready(function(){
 			//tx.executeSql("drop table passengertable");
 			tx.executeSql("create table if not exists passengertable(pid integer primary key,pfname text unique,plname text,page integer,ppass text,pphone text,paddress text)");
 			//tx.executeSql("drop table tramtable");
-			tx.executeSql("create table if not exists tramtable(tid integer primary key,tname text unique,tatime text,tdtime text,tsource text,tdestination text,tfare)");
+			tx.executeSql("create table if not exists tramtable(tid integer primary key,tname text unique,tatime text,tdtime text,tsource text,tdestination text,tfare text,tcapacity integer)");
 			//alert("Created Ttable");
-		});
+		});	tx.executeSql("create table if not exists bookingtable(bid integer primary key,bpid integer,btid integer,bseatcount integer)")
 	}
 
 	//Method to Register Passengers
@@ -55,8 +55,9 @@ $(document).ready(function(){
 		var stsource=$("#tramsource").val();
 		var stdestination=$("#tramdestination").val();
 		var stfare=$("#tramfare").val();
+		var stcapacity=$("#tramcapacity").val();
 		dbName.transaction(function(tx){
-			tx.executeSql("insert into tramtable(tname,tatime,tdtime,tsource,tdestination,tfare) values(?,?,?,?,?,?)",[stname,statime,stdtime,stsource,stdestination,stfare]);
+			tx.executeSql("insert into tramtable(tname,tatime,tdtime,tsource,tdestination,tfare,tcapacity) values(?,?,?,?,?,?,?)",[stname,statime,stdtime,stsource,stdestination,stfare,stcapacity]);
 		});
 		toastAlert("Saved Tram Details");
 		onTramListRequest();
@@ -107,13 +108,26 @@ $(document).ready(function(){
 			tx.executeSql("select * from tramtable where tsource='"+fsource+"' and tdestination='"+fdestination+"'",[],function(tx,results){
 				for(var i=0;i<results.rows.length;i++){
 					var row=results.rows.item(i);
-					$("#possibletramlist").append("<li id='"+i+"'><a href='#'><h2>"+row.tname+"</h2><p>Availability:Daily<br/>Arrival:"+row.tatime+" Departure:"+row.tdtime+"<br/>Source:"+row.tsource+" Destination:"+row.tdestination+"</p><p class='ui-li-aside'>Rs."+row.tfare+"</p></li>");
+					$("#possibletramlist").append("<li id='"+row.tid+"'><a href='#'><h2>"+row.tname+"</h2><p>Availability:Daily<br/>Arrival:"+row.tatime+" Departure:"+row.tdtime+"<br/>Source:"+row.tsource+" Destination:"+row.tdestination+"</p><p class='ui-li-aside'>Rs."+row.tfare+"</p></li>");
 				}
 				$("#possibletramlist").listview("refresh");
 			});
 		});
 	}
-		/**End of DB Methods**/
+
+	//Method to Book Tickets
+	function promptBookingPage(selectedtramid){
+		$(":mobile-pagecontainer").pagecontainer("change","#bookingprompt-page");
+		dbName.transaction(function(tx){
+			tx.executeSql("select * from tramtable where tid='"+selectedtramid+"'",[],function(tx,results){
+				var row=results.rows.item(0);
+				$("#selectedtramlabel").text(row.tname);
+
+			});
+		});
+	}
+
+			/**End of DB Methods**/
 	//Method to display Toast Alerts
 	function toastAlert(msg){
 		window.plugins.toast.showLongBottom(msg);
@@ -150,22 +164,27 @@ $(document).ready(function(){
 	});
 
 	$("#bookpgbtn").tap(function(){
-		//Shows Booking Page
+		//Shows the Search page which is the key to Book Tickets
 		$(":mobile-pagecontainer").pagecontainer("change","#bpd-page");
 		populateMenu();
 	});
 
-	$("#regbtn").tap(registerPassenger);
+	$(document).on("tap","#possibletramlist li",function(){
+		//Shows Booking Page
+		promptBookingPage($(this).id);
+	});
 
-	$("#loginbtn").tap(loginPassenger);
+	$("#regbtn").tap(registerPassenger);//Stores Passenger details in DB
 
-	$("#adminloginbtn").tap(loginAdmin);	
+	$("#loginbtn").tap(loginPassenger);//Logs in Passenger if the Login Credentials are Valid
 
-	$("#atbtn").tap(addTram);
+	$("#adminloginbtn").tap(loginAdmin);//Logs in admin after validation
 
-	$("#vtdbtn").tap(onTramListRequest);
+	$("#atbtn").tap(addTram);//Allows admin to add Tram Details
 
-	$("#tramsearchbtn").tap(findAvailableTrams);
+	$("#vtdbtn,#tdbtn").tap(onTramListRequest);//Displays all the available Tram List
+
+	$("#tramsearchbtn").tap(findAvailableTrams);//Allows Registered Passengers to Search Trams
 	
 	//Loaded all DOM elements
 });
