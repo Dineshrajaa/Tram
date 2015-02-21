@@ -149,7 +149,7 @@ $(document).ready(function(){
 
 	//Method to List Pending Tickets
 	function listPendingTickets(){
-		alert("Going to List Pending Tickets");
+		//alert("Going to List Pending Tickets");
 		$(":mobile-pagecontainer").pagecontainer("change","#pendingticket-page");
 		$("#pendingticketlist").html(" ");
 		dbName.transaction(function(tx){
@@ -165,7 +165,26 @@ $(document).ready(function(){
 	}
 
 	//Method to Prompt Approval page
+	function promptApprovalPage(pendingticketid){
+		selectedBookingId=pendingticketid;
+		$(":mobile-pagecontainer").pagecontainer("change","#pendingticketapproval-page");
+		dbName.transaction(function(tx){
+			tx.executeSql("select * from bookingtable as B join tramtable as T on B.tid=T.tid join passengertable as P on B.pid=P.pid where B.bid=pendingticketid",[],function(tx,results){
+				var row=results.rows.item(0);
+				$("#pbookingid").text("Booking ID: "+row.bid);
+				$("#ppassengername").text("Passenger Name: "+row.pfname);
+				$("#ptramname").text("Tram Name: "+row.tname);
+				$("#pbill").text("Total Bill: "+row.tfare*row.bseatcount);
+			});
+		});
+	}
 
+	//Method to approve Ticket
+	function approveTicket(){
+		dbName.transaction(function(tx){
+			
+		});
+	}
 
 
 			/**End of DB Methods**/
