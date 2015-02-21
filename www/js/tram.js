@@ -165,6 +165,23 @@ $(document).ready(function(){
 		else alert("There is no enough Tickets available");
 	}
 
+	//Method to track Ticket
+	function trackTickets(){
+		dbName.transaction(function(tx){
+			tx.executeSql("select * from bookingtable as B join tramtable as T on B.tid=T.tid join passengertable as P on B.pid=P.pid where B.pid='"+loggedId+"'",[],function(tx,results){
+				var row=results.rows.item(0);
+				$("#ptbid").text(row.bid);
+				$("#pttname").text(row.tname);
+				//$("#ptdescription").html("<p>Arrival Time: "+row.tatime+" Departure Time: "+row.tdtime+"<br/>Ticket Count: "+row.seatneeded+)
+				$("#ptdescription").html("<p>Tram Summary:<br/>Arrival Time"+row.tatime+" Departure Time:"+row.tdtime+"<br/>Source:"+row.tsource+" Destination:"+row.tdestination+"<br/>Total Fare:"+row.tfare*row.bseatcount+"</p>");
+
+				if(row.isapproved==0) $("#ptstatus").text("Ticket Status:Pending for Approval");
+				else if(row.isapproved==1) $("#ptstatus").text("Ticket Status:Approved");
+				else $("#ptstatus").text("Ticket Status:Rejected");
+			});
+		});
+	}
+
 	//Method to List Pending Tickets
 	function listPendingTickets(){
 		//alert("Going to List Pending Tickets");
@@ -209,9 +226,18 @@ $(document).ready(function(){
 				tx.executeSql("update tramtable set tavailable="+uavailableseats+" where tid='"+utid+"'");
 			});
 			listPendingTickets();
-		});
-		
+		});		
 	}
+
+	//Method to cancel Ticket
+	function cancelTicket(){
+		dbName.transaction(function(tx){
+			tx.executeSql("update bookingtable set isapproved=2 where bid='"+selectedBookingId+"'");
+		});
+		listPendingTickets();
+	}
+
+
 
 	//Method for listing Available Trams for Non-Registered Users
 	function nFindAvailableTrams(){
@@ -278,6 +304,12 @@ $(document).ready(function(){
 		populateMenuForGuests();
 	});
 
+	$("#trackpgbtn").tap(function(){
+		//Shows the Ticket Tracking Page
+		$(":mobile-pagecontainer").pagecontainer("change","#tickettracking-page");
+		trackTickets();
+	});
+
 	$(document).on("tap","#possibletramlist li",function(){
 		//Shows Booking Page
 		promptBookingPage($(this).attr('id'));
@@ -304,8 +336,12 @@ $(document).ready(function(){
 
 	$("#aptdbtn").tap(listPendingTickets);//Lists the Tickets which are waiting for Admin approval
 
-	$("#approveticketbtn").tap(approveTicket);//Approves the ticket
+	$("#approveticketbtn").tap(approveTicket);//Approves the Ticket
+
+	$("#cancelticketbtn").tap(cancelTicket);//Cancel the Ticket
 
 	$("#ntramsearchbtn").tap(nFindAvailableTrams);//Allows Registered Passengers to Search Trams
+	
+
 	//Loaded all DOM elements
 });
