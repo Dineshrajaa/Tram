@@ -1,5 +1,6 @@
 $(document).ready(function(){
 	var dbName;//Database Name
+	var loggedId,neededTramId,selectedBookingId;
 
 		/**Start of DB Methods**/
 	//Method to Initialize Tables
@@ -8,9 +9,10 @@ $(document).ready(function(){
 			//tx.executeSql("drop table passengertable");
 			tx.executeSql("create table if not exists passengertable(pid integer primary key,pfname text unique,plname text,page integer,ppass text,pphone text,paddress text)");
 			//tx.executeSql("drop table tramtable");
-			tx.executeSql("create table if not exists tramtable(tid integer primary key,tname text unique,tatime text,tdtime text,tsource text,tdestination text,tfare text,tcapacity integer)");
+			tx.executeSql("create table if not exists tramtable(tid integer primary key,tname text unique,tatime text,tdtime text,tsource text,tdestination text,tfare text,tcapacity integer,tavailable integer)");
 			//alert("Created Ttable");
-		});	tx.executeSql("create table if not exists bookingtable(bid integer primary key,bpid integer,btid integer,bseatcount integer)")
+			tx.executeSql("create table if not exists bookingtable(bid integer primary key,pid integer,tid integer,bseatcount integer,bseatclass text,isapproved integer)");
+		});	
 	}
 
 	//Method to Register Passengers
@@ -32,8 +34,12 @@ $(document).ready(function(){
 		var lname=$("#uname").val();
 		var lpass=$("#upass").val();
 		dbName.transaction(function(tx){
-			tx.executeSql("select * from passengertable where pfname='"+lname+"' and ppass='"+lpass+"'",[],function(transaction,results){				
-				if(results.rows.length>0) $(":mobile-pagecontainer").pagecontainer("change","#pd-page");
+			tx.executeSql("select * from passengertable where pfname='"+lname+"' and ppass='"+lpass+"'",[],function(transaction,results){
+				loggedId=results.rows.item(0).pid;				
+				if(results.rows.length>0) {
+					$(":mobile-pagecontainer").pagecontainer("change","#pd-page");
+					
+				}
 				else alert("Check your Login Credentials");
 			});
 		});
@@ -56,8 +62,9 @@ $(document).ready(function(){
 		var stdestination=$("#tramdestination").val();
 		var stfare=$("#tramfare").val();
 		var stcapacity=$("#tramcapacity").val();
+		var stavailable=stcapacity;
 		dbName.transaction(function(tx){
-			tx.executeSql("insert into tramtable(tname,tatime,tdtime,tsource,tdestination,tfare,tcapacity) values(?,?,?,?,?,?,?)",[stname,statime,stdtime,stsource,stdestination,stfare,stcapacity]);
+			tx.executeSql("insert into tramtable(tname,tatime,tdtime,tsource,tdestination,tfare,tcapacity,tavailable) values(?,?,?,?,?,?,?,?)",[stname,statime,stdtime,stsource,stdestination,stfare,stcapacity,stavailable]);
 		});
 		toastAlert("Saved Tram Details");
 		onTramListRequest();
@@ -115,17 +122,51 @@ $(document).ready(function(){
 		});
 	}
 
-	//Method to Book Tickets
+	//Method to Populate and show Booking Prompt
 	function promptBookingPage(selectedtramid){
+		neededTramId=selectedtramid;
 		$(":mobile-pagecontainer").pagecontainer("change","#bookingprompt-page");
 		dbName.transaction(function(tx){
 			tx.executeSql("select * from tramtable where tid='"+selectedtramid+"'",[],function(tx,results){
 				var row=results.rows.item(0);
 				$("#selectedtramlabel").text(row.tname);
-
+				$("#availablecount").val(row.tavailable);
+				$("#selectedtraminfo").html("<p>Tram Summary:<br/>Arrival Time"+row.tatime+" Departure Time:"+row.tdtime+"<br/>Source:"+row.tsource+" Destination:"+row.tdestination+"<br/>Fare:"+row.tfare+"</p>");				
 			});
 		});
 	}
+
+	//Method to Book Tickets
+	function bookTickets(){
+		var requiredSeat=$("#seatneeded").val();
+		var requiredClass=$("#tramclass :selected").text();
+		var onhold=0;
+		dbName.transaction(function(tx){
+			tx.executeSql("insert into bookingtable(pid,tid,bseatcount,bseatclass,isapproved) values(?,?,?,?,?)",[loggedId,neededTramId,requiredSeat,requiredClass,onhold]);
+		});
+		toastAlert("Ticked Saved for Confirmation");
+	}
+
+	//Method to List Pending Tickets
+	function listPendingTickets(){
+		alert("Going to List Pending Tickets");
+		$(":mobile-pagecontainer").pagecontainer("change","#pendingticket-page");
+		$("#pendingticketlist").html(" ");
+		dbName.transaction(function(tx){
+			tx.executeSql("select * from bookingtable as B join tramtable as T on B.tid=T.tid join passengertable as P on B.pid=P.pid where B.isapproved='0'",[],function(tx,results){
+				//and B.tid=T.tid and where B.isapproved='0' as B join passengertable as P on B.pid=P.pid
+				for(var i=0;i<results.rows.length;i++){
+					var row=results.rows.item(i);
+					$("#pendingticketlist").append("<li id='"+row.bid+"'><a href='#'><h2>"+row.pfname+"</h2><p><strong>"+row.tname+"</strong></p><p>Arrival Time:"+row.tatime+" Departure Time:"+row.tdtime+"<br/>Source:"+row.tsource+" Destination:"+row.tdestination+"<br/>Total Fare:"+row.tfare*row.bseatcount+"</p></li>");
+				}
+				$("#pendingticketlist").listview("refresh");
+			});
+		});
+	}
+
+	//Method to Prompt Approval page
+
+
 
 			/**End of DB Methods**/
 	//Method to display Toast Alerts
@@ -171,7 +212,12 @@ $(document).ready(function(){
 
 	$(document).on("tap","#possibletramlist li",function(){
 		//Shows Booking Page
-		promptBookingPage($(this).id);
+		promptBookingPage($(this).attr('id'));
+	});
+
+	$(document).on("tap","#pendingticketlist li",function(){
+		//Shows Approval Page
+		promptApprovalPage($(this).attr('id'));
 	});
 
 	$("#regbtn").tap(registerPassenger);//Stores Passenger details in DB
@@ -186,5 +232,8 @@ $(document).ready(function(){
 
 	$("#tramsearchbtn").tap(findAvailableTrams);//Allows Registered Passengers to Search Trams
 	
+	$("#bookbtn").tap(bookTickets);//Allows User to Book Tickets 
+
+	$("#aptdbtn").tap(listPendingTickets);//Lists the Tickets which are waiting for Admin approval
 	//Loaded all DOM elements
 });
