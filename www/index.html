@@ -23,7 +23,7 @@
                <input type="button" id="prbtn" value="Passenger Registration" data-mini="false" />
                <input type="button" id="plbtn" value="Passenger Login" data-mini="false" />
                <input type="button" id="albtn" value="Admin Login" data-mini="false"/>
-               <input type="button" id="tdbtn" value="Tram Detail" data-mini="false"/> 
+               <input type="button" id="tdbtn" value="Tram List" data-mini="false"/> 
                <input type="button" id="tsbtn" value="Tram Search" data-mini="false"/>
             </article>
             <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
@@ -103,7 +103,7 @@
             <article data-role="content">
                 <input type="button" id="bookpgbtn" value="Book Tickets" />
                 <input type="button" id="trackpgbtn" value="Track Tickets" />
-                <input type="button" id="enquirepgbtn" value="Enquire Tickets" />
+                <input type="button" id="cancelpgbtn" value="Cancel Tickets" />
             </article>
         </section>
                 <!--Admin Home-->
@@ -245,6 +245,22 @@
             <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <h1>&copy All Rights Reserved</h1>
             </footer>
+        </section>
+
+                <!--Tram Search for Non-Registered Users-->
+        <section id="nrts-page" data-role="page">
+            <header data-role="header" data-theme="b" data-position="fixed">
+                <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
+                <h1>Search Tram</h1>
+            </header>
+            <article data-role="content">
+                <label for="startingpoint">Source:</label>
+                <select id="startingpoint"></select>
+                <label for="endingpoint">Destination:</label>
+                <select id="endingpoint"></select>
+                <input type="button" id="ntramsearchbtn" value="Search" />
+                <ul id="npossibletramlist" data-role="listview"></ul>
+            </article>
         </section>
 
         <script type="text/javascript" src="cordova.js"></script>        

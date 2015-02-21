@@ -106,6 +106,21 @@ $(document).ready(function(){
 		
 	}
 
+	//Method to Populate Source and Destination for Guests
+	function populateMenuForGuests(){
+		$("#startingpoint,#endingpoint,#npossibletramlist").html(" ");
+		dbName.transaction(function(tx){
+			tx.executeSql("select * from tramtable",[],function(tx,results){
+				for(var i=0;i<results.rows.length;i++){
+					var row=results.rows.item(i);
+					$("#startingpoint").append("<option value='"+i+"'>"+row.tsource+"</option>");
+					$("#endingpoint").append("<option value='"+i+"'>"+row.tdestination+"</option>");
+				}
+				$("#startingpoint,#endingpoint").selectmenu("refresh");
+			});
+		});
+	}
+
 	//Reusable Method for listing Available Trams
 	function findAvailableTrams(){
 		var fsource=$("#sourcemenu :selected").text();
@@ -141,10 +156,13 @@ $(document).ready(function(){
 		var requiredSeat=$("#seatneeded").val();
 		var requiredClass=$("#tramclass :selected").text();
 		var onhold=0;
+		if(requiredSeat<$("#availablecount").val()){
 		dbName.transaction(function(tx){
 			tx.executeSql("insert into bookingtable(pid,tid,bseatcount,bseatclass,isapproved) values(?,?,?,?,?)",[loggedId,neededTramId,requiredSeat,requiredClass,onhold]);
 		});
 		toastAlert("Ticked Saved for Confirmation");
+		}
+		else alert("There is no enough Tickets available");
 	}
 
 	//Method to List Pending Tickets
@@ -169,7 +187,7 @@ $(document).ready(function(){
 		selectedBookingId=pendingticketid;
 		$(":mobile-pagecontainer").pagecontainer("change","#pendingticketapproval-page");
 		dbName.transaction(function(tx){
-			tx.executeSql("select * from bookingtable as B join tramtable as T on B.tid=T.tid join passengertable as P on B.pid=P.pid where B.bid=pendingticketid",[],function(tx,results){
+			tx.executeSql("select * from bookingtable as B join tramtable as T on B.tid=T.tid join passengertable as P on B.pid=P.pid where B.bid='"+pendingticketid+"'",[],function(tx,results){
 				var row=results.rows.item(0);
 				$("#pbookingid").text("Booking ID: "+row.bid);
 				$("#ppassengername").text("Passenger Name: "+row.pfname);
@@ -182,7 +200,32 @@ $(document).ready(function(){
 	//Method to approve Ticket
 	function approveTicket(){
 		dbName.transaction(function(tx){
-			
+			tx.executeSql("update bookingtable set isapproved=1 where bid='"+selectedBookingId+"'");
+			tx.executeSql("select * from bookingtable as B join tramtable as T on B.tid=T.tid join passengertable as P on B.pid=P.pid where B.bid='"+selectedBookingId+"'",[],function(tx,results){
+				var row=results.rows.item(0);
+				var upid=row.pid;
+				var utid=row.tid;
+				var uavailableseats=row.tavailable-row.bseatcount;
+				tx.executeSql("update tramtable set tavailable="+uavailableseats+" where tid='"+utid+"'");
+			});
+			listPendingTickets();
+		});
+		
+	}
+
+	//Method for listing Available Trams for Non-Registered Users
+	function nFindAvailableTrams(){
+		var fsource=$("#startingpoint :selected").text();
+		var fdestination=$("#endingpoint :selected").text();
+		$("#npossibletramlist").html(" ");
+		dbName.transaction(function(tx){
+			tx.executeSql("select * from tramtable where tsource='"+fsource+"' and tdestination='"+fdestination+"'",[],function(tx,results){
+				for(var i=0;i<results.rows.length;i++){
+					var row=results.rows.item(i);
+					$("#npossibletramlist").append("<li id='"+row.tid+"'><a href='#'><h2>"+row.tname+"</h2><p>Availability:Daily<br/>Arrival:"+row.tatime+" Departure:"+row.tdtime+"<br/>Source:"+row.tsource+" Destination:"+row.tdestination+"</p><p class='ui-li-aside'>Rs."+row.tfare+"</p></li>");
+				}
+				$("#npossibletramlist").listview("refresh");
+			});
 		});
 	}
 
@@ -229,6 +272,12 @@ $(document).ready(function(){
 		populateMenu();
 	});
 
+	$("#tsbtn").tap(function(){
+		//Shows the Search page to Non-Registered Users
+		$(":mobile-pagecontainer").pagecontainer("change","#nrts-page");
+		populateMenuForGuests();
+	});
+
 	$(document).on("tap","#possibletramlist li",function(){
 		//Shows Booking Page
 		promptBookingPage($(this).attr('id'));
@@ -254,5 +303,9 @@ $(document).ready(function(){
 	$("#bookbtn").tap(bookTickets);//Allows User to Book Tickets 
 
 	$("#aptdbtn").tap(listPendingTickets);//Lists the Tickets which are waiting for Admin approval
+
+	$("#approveticketbtn").tap(approveTicket);//Approves the ticket
+
+	$("#ntramsearchbtn").tap(nFindAvailableTrams);//Allows Registered Passengers to Search Trams
 	//Loaded all DOM elements
 });
