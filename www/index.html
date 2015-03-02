@@ -205,7 +205,7 @@
                 <option id="side">Side</option>
                 </select>
                 <label for="seatneeded">Seat Count</label>
-                <input type="number" id="seatneeded" min="1" max="100" />
+                <input type="tel" id="seatneeded"  />
                 <input type="button" id="bookbtn" value="Book" />
                 </form>
             </article>
@@ -221,10 +221,13 @@
                 <h1>Track Your Tickets</h1>
             </header>
             <article data-role="content">
-            <label id="ptbid"></label><br/>
+            <!--<label id="ptbid"></label><br/>
             <label id="pttname"></label><br/>
             <div id="ptdescription"></div>
             <label id="ptstatus"></label>
+            -->
+            <ul data-role="listview" id="ptdescription"></ul>
+            
             </article>
              <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <h1>&copy All Rights Reserved</h1>
