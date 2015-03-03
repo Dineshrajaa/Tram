@@ -1,7 +1,12 @@
 $(document).ready(function(){
 	var dbName;//Database Name
 	var loggedId,neededTramId,selectedBookingId;
-
+	var defaultLatLng = new google.maps.LatLng(34.0983425, -118.3267434);
+	var mapHeight =$(window).height() - 44;
+	var geocoder=new google.maps.Geocoder();
+	var directionsDisplay;
+	var directionsService = new google.maps.DirectionsService();
+	var map;
 		/**Start of DB Methods**/
 	//Method to Initialize Tables
 	function dbSetting(){
@@ -160,7 +165,7 @@ $(document).ready(function(){
 		dbName.transaction(function(tx){
 			tx.executeSql("insert into bookingtable(pid,tid,bseatcount,bseatclass,isapproved) values(?,?,?,?,?)",[loggedId,neededTramId,requiredSeat,requiredClass,onhold]);
 		});
-		toastAlert("Ticked Saved for Confirmation");
+		toastAlert("Ticket Saved for Confirmation");
 		}
 		else alert("There is no enough Tickets available");
 	}
@@ -262,12 +267,54 @@ $(document).ready(function(){
 		});
 	}
 
+	//Method to find the source and destination
+	function findSourceDestination(fid){
+		alert(fid);
+		dbName.transaction(function(tx){
+			tx.executeSql("select * from tramtable where tid="+fid,[],function(tx,results){				
+				var row=results.rows.item(0);				
+				calcRoute(row.tsource,row.tdestination);
+			});
+		});
+	}
+
 
 			/**End of DB Methods**/
 	//Method to display Toast Alerts
 	function toastAlert(msg){
 		window.plugins.toast.showLongBottom(msg);
 	}
+
+			/**Start of Map Methods**/
+	//Method to display Map
+	function drawMap() {
+	//Displays the map in the page	 
+        directionsDisplay = new google.maps.DirectionsRenderer();
+  var chicago = new google.maps.LatLng(41.850033, -87.6500523);
+  var mapOptions = {
+    zoom:7,
+    center: chicago
+  };
+  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+  directionsDisplay.setMap(map);
+    
+    }
+
+    function calcRoute(start,end) {  
+  alert("Going to plot");
+  var request = {
+      origin:start,
+      destination:end,
+      travelMode: google.maps.TravelMode.DRIVING
+  };
+  directionsService.route(request, function(response, status) {
+    if (status == google.maps.DirectionsStatus.OK) {
+      directionsDisplay.setDirections(response);
+    }
+  });
+}
+
+			/**End of Map Methods**/
 
 
 
@@ -322,10 +369,33 @@ $(document).ready(function(){
 		promptBookingPage($(this).attr('id'));
 	});
 
+	$(document).on("tap","#npossibletramlist li",function(){
+		//Shows Map Route Page
+		findSourceDestination($(this).attr('id'));
+		$(":mobile-pagecontainer").pagecontainer("change","#map-page");
+		
+	});
+
 	$(document).on("tap","#pendingticketlist li",function(){
 		//Shows Approval Page
 		promptApprovalPage($(this).attr('id'));
 	});
+
+	$("#bookbtn").tap(function(){
+		$(":mobile-pagecontainer").pagecontainer("change","#payment-page");
+	});
+
+	$(document).on("pageshow","#map-page",function() {
+				//Makes the Map to appear properly
+				drawMap();
+				$("#map-canvas").css("height",mapHeight+"px");
+				google.maps.event.trigger(map, 'resize');
+				
+				//$('#map-canvas').gmap({'center': yourStartLatLng});				
+                //$('#map-canvas').gmap('refresh');                
+        });
+        
+
 
 	$("#regbtn").tap(registerPassenger);//Stores Passenger details in DB
 
@@ -339,7 +409,9 @@ $(document).ready(function(){
 
 	$("#tramsearchbtn").tap(findAvailableTrams);//Allows Registered Passengers to Search Trams
 	
-	$("#bookbtn").tap(bookTickets);//Allows User to Book Tickets 
+	//Allows User to Pay for  Tickets 
+
+	$("#paybtn").tap(bookTickets);
 
 	$("#aptdbtn").tap(listPendingTickets);//Lists the Tickets which are waiting for Admin approval
 

@@ -7,10 +7,12 @@
         <meta name="msapplication-tap-highlight" content="no" />
         
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+        <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
         <script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
         <script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js"></script>
         <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.5.min.css" />
         <script type="text/javascript" src="js/tram.js"></script>
+        <script type="text/javascript" src="js/jquery.ui.map.full.min.js"></script>
         <title>Tram</title>
     </head>
     <body>
@@ -24,7 +26,7 @@
                <input type="button" id="plbtn" value="Passenger Login" data-mini="false" />
                <input type="button" id="albtn" value="Admin Login" data-mini="false"/>
                <input type="button" id="tdbtn" value="Tram List" data-mini="false"/> 
-               <input type="button" id="tsbtn" value="Tram Search" data-mini="false"/>
+               <input type="button" id="tsbtn" value="Tram Search" data-mini="false"/>               
             </article>
             <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <h1>&copy All Rights Reserved</h1>
@@ -184,6 +186,16 @@
             </footer>
         </section>
 
+                <!--Tram Map Page-->
+        <section id="map-page" data-role="page">
+            <header data-role="header" data-theme="b" data-position="fixed">
+            <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
+            <h1>Route</h1>
+            </header>
+            <article data-role="content" class="ui-content">
+                <div id="map-canvas" style="width:100%"></div>
+            </article>
+        </section>
                 <!--Tram Booking Prompt-->
         <section id="bookingprompt-page" data-role="page">
             <header data-role="header" data-theme="b" data-position="fixed">
@@ -206,28 +218,40 @@
                 </select>
                 <label for="seatneeded">Seat Count</label>
                 <input type="tel" id="seatneeded"  />
-                <input type="button" id="bookbtn" value="Book" />
+                <select id="paymentmode">
+                    <option>Debit Card</option>
+                    <option>Credit Card</option>
+                    <option>NetPay</option>
+                </select>
+                <input type="button" id="bookbtn" value="Pay & Book" />
                 </form>
             </article>
             <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <h1>&copy All Rights Reserved</h1>
             </footer>
         </section>
-
+        <section id="payment-page" data-role="page">
+             <header data-role="header" data-theme="b" data-position="fixed">
+                <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
+                <h1>Payment</h1>
+            </header>
+            <article data-role="content">
+                <label for="custid">CustomerID</label>
+                <input type="text" id="custid" placeholder="Customer ID" />
+                <label for="custpin">PIN</label>
+                <input type="text" id="custpin" placeholder="PIN" />
+                <input type="button" id="paybtn" value="Pay" />                
+                <a href="#" data-rel="back" data-role="button" id="paycancelbtn">Cancel</a>
+            </article>
+        </section>
             <!--Ticket Tracking Page-->
         <section id="tickettracking-page" data-role="page">
             <header data-role="header" data-theme="b" data-position="fixed">
                 <a href="#" data-role="button" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
                 <h1>Track Your Tickets</h1>
             </header>
-            <article data-role="content">
-            <!--<label id="ptbid"></label><br/>
-            <label id="pttname"></label><br/>
-            <div id="ptdescription"></div>
-            <label id="ptstatus"></label>
-            -->
-            <ul data-role="listview" id="ptdescription"></ul>
-            
+            <article data-role="content">            
+            <ul data-role="listview" id="ptdescription"></ul>            
             </article>
              <footer data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <h1>&copy All Rights Reserved</h1>
