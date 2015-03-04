@@ -312,6 +312,7 @@ $(document).ready(function(){
       directionsDisplay.setDirections(response);
     }
   });
+  //google.maps.event.trigger(map, 'resize');
 }
 
 			/**End of Map Methods**/
@@ -374,6 +375,7 @@ $(document).ready(function(){
 		//$("#map-canvas").html("");
 		findSourceDestination($(this).attr('id'));
 		$(":mobile-pagecontainer").pagecontainer("change","#map-page");
+		drawMap();
 		
 	});
 
