@@ -182,7 +182,7 @@ $(document).ready(function(){
 				else if(row.isapproved==1) status="Status:Approved";
 				else status="Status:Rejected";
 
-					$("#ptdescription").append("<li id='"+row.bid+"'><a href='#'><h2>Bill ID:"+row.bid+"</h2><p><strong>"+row.tname+"</strong></p><p>Arrival Time:"+row.tatime+" Departure Time:"+row.tdtime+"<br/>Source:"+row.tsource+" Destination:"+row.tdestination+"<br/>Total Fare:"+row.tfare*row.bseatcount+"</p><p class='ui-li-aside'>"+status+"</p></a></li>")
+					$("#ptdescription").append("<li id='"+row.bid+"'><a href='#'><h2>Bill ID:"+row.bid+"</h2><p><strong>"+row.tname+"</strong></p><p>Arrival Time:"+row.tatime+" Departure Time:"+row.tdtime+"<br/>Source:"+row.tsource+" Destination:"+row.tdestination+"<br/>No.of Seats:"+row.bseatcount+"<br/>Total Fare:"+row.tfare*row.bseatcount+"</p><p class='ui-li-aside'>"+status+"</p></a></li>")
 				}
 				$("#ptdescription").listview("refresh");
 				//$("#ptbid").text(row.bid);
@@ -269,7 +269,7 @@ $(document).ready(function(){
 
 	//Method to find the source and destination
 	function findSourceDestination(fid){
-		alert(fid);
+		//alert(fid);
 		dbName.transaction(function(tx){
 			tx.executeSql("select * from tramtable where tid="+fid,[],function(tx,results){				
 				var row=results.rows.item(0);				
@@ -289,7 +289,7 @@ $(document).ready(function(){
 	//Method to display Map
 	function drawMap() {
 	//Displays the map in the page	 
-        directionsDisplay = new google.maps.DirectionsRenderer();
+  directionsDisplay = new google.maps.DirectionsRenderer();
   var chicago = new google.maps.LatLng(41.850033, -87.6500523);
   var mapOptions = {
     zoom:7,
@@ -301,7 +301,7 @@ $(document).ready(function(){
     }
 
     function calcRoute(start,end) {  
-  alert("Going to plot");
+  //alert("Going to plot");
   var request = {
       origin:start,
       destination:end,
@@ -371,6 +371,7 @@ $(document).ready(function(){
 
 	$(document).on("tap","#npossibletramlist li",function(){
 		//Shows Map Route Page
+		//$("#map-canvas").html("");
 		findSourceDestination($(this).attr('id'));
 		$(":mobile-pagecontainer").pagecontainer("change","#map-page");
 		
@@ -384,15 +385,17 @@ $(document).ready(function(){
 	$("#bookbtn").tap(function(){
 		$(":mobile-pagecontainer").pagecontainer("change","#payment-page");
 	});
+	
 
+$(document).on("pageinit","#map-page",function() {
+		//Draws the map																			
+				drawMap();				              
+      });
 	$(document).on("pageshow","#map-page",function() {
-				//Makes the Map to appear properly
-				drawMap();
-				$("#map-canvas").css("height",mapHeight+"px");
-				google.maps.event.trigger(map, 'resize');
-				
-				//$('#map-canvas').gmap({'center': yourStartLatLng});				
-                //$('#map-canvas').gmap('refresh');                
+				//Makes the Map to appear properly																
+				$("#map-canvas").css("height",mapHeight+"px");								
+				google.maps.event.trigger(map, 'resize');			
+				                
         });
         
 
